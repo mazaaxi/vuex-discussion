@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import AppPage from '@/index.vue'
 import {store} from '@/store'
+import '@/logic'
 
 new Vue({
   store,

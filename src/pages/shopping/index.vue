@@ -6,7 +6,7 @@
 
     <h2>Products</h2>
     <ul>
-      <li v-for="product in allProducts" :key="product.id">
+      <li v-for="product in $logic.shop.allProducts" :key="product.id">
         {{ product.title }} - {{ `$ ${product.price}` }}
         <br />
         <button :disabled="!product.inventory" @click="m_addButtonOnClick(product)">
@@ -19,12 +19,14 @@
 
     <h2>Your Cart</h2>
     <div>
-      <p v-show="!cartItems.length"><i>Please add some products to cart.</i></p>
+      <p v-show="!$logic.shop.cartItems.length"><i>Please add some products to cart.</i></p>
       <ul>
-        <li v-for="cartItem in cartItems" :key="cartItem.id">{{ cartItem.title }} - {{ `$ ${cartItem.price}` }} x {{ cartItem.quantity }}</li>
+        <li v-for="cartItem in $logic.shop.cartItems" :key="cartItem.id">
+          {{ cartItem.title }} - {{ `$ ${cartItem.price}` }} x {{ cartItem.quantity }}
+        </li>
       </ul>
-      <p>Total: {{ `$ ${cartTotalPrice}` }}</p>
-      <p><button :disabled="!cartItems.length" @click="m_checkoutButtonOnClick">Checkout</button></p>
+      <p>Total: {{ `$ ${$logic.shop.cartTotalPrice}` }}</p>
+      <p><button :disabled="!$logic.shop.cartItems.length" @click="m_checkoutButtonOnClick">Checkout</button></p>
       <p v-show="m_checkoutStatus">Checkout {{ m_checkoutStatus.message }}.</p>
     </div>
   </div>
@@ -32,34 +34,16 @@
 
 <script lang="ts">
 import {Component, Vue} from 'vue-property-decorator'
-import {mapActions, mapGetters} from 'vuex'
-import {CartTypes, CheckoutStatus, Product, ProductTypes} from '@/store'
+import {CheckoutStatus, Product} from '@/logic'
 
-@Component({
-  computed: {
-    ...mapGetters(ProductTypes.PATH, [ProductTypes.ALL_PRODUCTS]),
-    ...mapGetters(CartTypes.PATH, [CartTypes.CART_ITEMS, CartTypes.CART_TOTAL_PRICE, CartTypes.CHECKOUT_STATUS]),
-  },
-  methods: {
-    ...mapActions(ProductTypes.PATH, [ProductTypes.PULL_ALL_PRODUCTS]),
-    ...mapActions(CartTypes.PATH, [CartTypes.ADD_PRODUCT_TO_CART, CartTypes.CHECKOUT]),
-  },
-})
+@Component
 export default class ShoppingPage extends Vue {
-  checkoutStatus!: CartTypes.checkoutStatus
-
-  addProductToCart!: CartTypes.addProductToCart
-
-  pullAllProducts!: ProductTypes.pullAllProducts
-
-  checkout!: CartTypes.checkout
-
   async created() {
-    await this.pullAllProducts()
+    await this.$logic.shop.pullAllProducts()
   }
 
   get m_checkoutStatus(): {result: boolean; message: string} {
-    const checkoutStatus = this.checkoutStatus
+    const checkoutStatus = this.$logic.shop.checkoutStatus
     const result = checkoutStatus === CheckoutStatus.None || checkoutStatus === CheckoutStatus.Successful
     return {
       result,
@@ -68,11 +52,11 @@ export default class ShoppingPage extends Vue {
   }
 
   async m_addButtonOnClick(product: Product): Promise<void> {
-    await this.addProductToCart(product.id)
+    await this.$logic.shop.addProductToCart(product.id)
   }
 
   async m_checkoutButtonOnClick(): Promise<void> {
-    await this.checkout()
+    await this.$logic.shop.checkout()
   }
 }
 </script>
