@@ -8,19 +8,19 @@ import {ShopLogic} from '@/logic/types'
 @Component
 export class ShopLogicImpl extends Vue implements ShopLogic {
   get allProducts(): Product[] {
-    return store.getters[`${ProductTypes.PATH}/${ProductTypes.ALL_PRODUCTS}`]
+    return store.getters[`${ProductTypes.PATH}/${ProductTypes.ALL}`]
   }
 
   pullAllProducts(): Promise<void> {
-    return store.dispatch(`${ProductTypes.PATH}/${ProductTypes.PULL_ALL_PRODUCTS}`)
+    return store.dispatch(`${ProductTypes.PATH}/${ProductTypes.PULL_ALL}`)
   }
 
   get cartItems(): CartItem[] {
-    return store.getters[`${CartTypes.PATH}/${CartTypes.CART_ITEMS}`]
+    return store.getters[`${CartTypes.PATH}/${CartTypes.ITEMS}`]
   }
 
   get cartTotalPrice(): number {
-    return store.getters[`${CartTypes.PATH}/${CartTypes.CART_TOTAL_PRICE}`]
+    return store.getters[`${CartTypes.PATH}/${CartTypes.TOTAL_PRICE}`]
   }
 
   get checkoutStatus(): CheckoutStatus {

@@ -15,7 +15,7 @@ export const cartModule = new class implements CartModule {
       return state.checkoutStatus
     },
 
-    [CartTypes.CART_ITEMS](state, getters, rootState): CartItem[] {
+    [CartTypes.ITEMS](state, getters, rootState): CartItem[] {
       const allProducts = (rootState.product as ProductState).all
       return state.items.map(({id, quantity}) => {
         const product = allProducts.find(item => item.id === id)!
@@ -28,32 +28,16 @@ export const cartModule = new class implements CartModule {
       })
     },
 
-    [CartTypes.CART_TOTAL_PRICE](state, getters): number {
-      const cartItems = getters[CartTypes.CART_ITEMS] as CartItem[]
+    [CartTypes.TOTAL_PRICE](state, getters): number {
+      const cartItems = getters[CartTypes.ITEMS] as CartItem[]
       return cartItems.reduce((total, product) => {
         return total + product.price * product.quantity
       }, 0)
     },
-
-    [CartTypes.GET_CART_ITEM_BY_ID](state, getters, rootState, rootGetters): (productId: string) => CartItem | undefined {
-      return (productId: string) => {
-        const product = getProductById(rootGetters, productId)
-        const cartItem = state.items.find(item => {
-          return item.id === productId
-        })
-        if (!cartItem) return undefined
-        return {
-          id: cartItem.id,
-          title: product.title,
-          price: product.price,
-          quantity: cartItem.quantity,
-        } as CartItem
-      }
-    },
   }
 
   mutations: MutationTree<CartState> = {
-    [CartTypes.SET_CART_ITEMS](state, items: Array<{id: string; quantity: number}>) {
+    [CartTypes.SET_ITEMS](state, items: CartItem[]) {
       state.items = items
     },
 
@@ -61,9 +45,11 @@ export const cartModule = new class implements CartModule {
       state.checkoutStatus = status
     },
 
-    [CartTypes.PUSH_PRODUCT_TO_CART](state, productId: string) {
+    [CartTypes.PUSH_PRODUCT_TO_CART](state, product: Product) {
       state.items.push({
-        id: productId,
+        id: product.id,
+        title: product.title,
+        price: product.price,
         quantity: 1,
       })
     },
@@ -83,7 +69,7 @@ export const cartModule = new class implements CartModule {
       if (product.inventory > 0) {
         const cartItem = context.state.items.find(item => item.id === product.id)
         if (!cartItem) {
-          context.commit(CartTypes.PUSH_PRODUCT_TO_CART, product.id)
+          context.commit(CartTypes.PUSH_PRODUCT_TO_CART, product)
         } else {
           context.commit(CartTypes.INCREMENT_ITEM_QUANTITY, product.id)
         }
@@ -97,7 +83,7 @@ export const cartModule = new class implements CartModule {
       context.commit(CartTypes.SET_CHECKOUT_STATUS, CheckoutStatus.None)
       try {
         await api.shop.buyProducts(cartProducts)
-        context.commit(CartTypes.SET_CART_ITEMS, []) // カートを空にする
+        context.commit(CartTypes.SET_ITEMS, []) // カートを空にする
         context.commit(CartTypes.SET_CHECKOUT_STATUS, CheckoutStatus.Successful)
       } catch (err) {
         context.commit(CartTypes.SET_CHECKOUT_STATUS, CheckoutStatus.Failed)
@@ -107,7 +93,7 @@ export const cartModule = new class implements CartModule {
 }()
 
 function getProductById(rootGetters: any, productId: string): Product {
-  const path = `${ProductTypes.PATH}/${ProductTypes.GET_PRODUCT_BY_ID}`
+  const path = `${ProductTypes.PATH}/${ProductTypes.GET_BY_ID}`
   const result = rootGetters[path](productId) as Product | undefined
   if (!result) {
     throw new Error(`A Product that matches the specified productId "${productId}" was not found.`)
