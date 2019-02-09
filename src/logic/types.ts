@@ -15,7 +15,7 @@ export interface ShopLogic {
 
   checkoutStatus: CheckoutStatus
 
-  addProductToCart(productId: string): Promise<void>
+  addProductToCart(productId: string): void
 
   checkout(): Promise<void>
 }

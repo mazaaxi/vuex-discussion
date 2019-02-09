@@ -1,44 +1,30 @@
-import {GetterTree, MutationTree, ActionTree} from 'vuex'
-import {ProductModule, ProductState, RootState, Product, ProductTypes} from '@/store/types'
-import {api} from '@/api'
+import Vue from 'vue'
+import {Component} from 'vue-property-decorator'
+import {Product, ProductModule, ProductState} from '@/store/types'
 
-export const productModule = new class implements ProductModule {
-  namespaced = true
-
-  state: ProductState = {
+@Component
+export class ProductModuleImpl extends Vue implements ProductModule {
+  m_state: ProductState = {
     all: [],
   }
 
-  getters: GetterTree<ProductState, RootState> = {
-    [ProductTypes.ALL_PRODUCTS](state): Product[] {
-      return state.all
-    },
-
-    [ProductTypes.GET_PRODUCT_BY_ID](state) {
-      return (productId: string) => {
-        const product = state.all.find(item => item.id === productId)
-        return product
-      }
-    },
+  get all(): Product[] {
+    return this.m_state.all
   }
 
-  mutations: MutationTree<ProductState> = {
-    [ProductTypes.SET_PRODUCTS](state, products: Product[]): void {
-      state.all = products
-    },
-
-    [ProductTypes.DECREMENT_INVENTORY](state, productId: string): void {
-      const product = state.all.find(item => item.id === productId)
-      if (product) {
-        product.inventory--
-      }
-    },
+  getById(productId: string): Product | undefined {
+    const product = this.m_state.all.find(item => item.id === productId)
+    return product
   }
 
-  actions: ActionTree<ProductState, RootState> = {
-    async [ProductTypes.PULL_ALL_PRODUCTS](context): Promise<void> {
-      const products = await api.shop.getProducts()
-      context.commit(ProductTypes.SET_PRODUCTS, products)
-    },
+  setAll(products: Product[]): void {
+    this.m_state.all = products
   }
-}()
+
+  decrementInventory(productId: string): void {
+    const product = this.m_state.all.find(item => item.id === productId)
+    if (product) {
+      product.inventory--
+    }
+  }
+}

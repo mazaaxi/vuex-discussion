@@ -51,8 +51,8 @@ export default class ShoppingPage extends Vue {
     }
   }
 
-  async m_addButtonOnClick(product: Product): Promise<void> {
-    await this.$logic.shop.addProductToCart(product.id)
+  m_addButtonOnClick(product: Product): void {
+    this.$logic.shop.addProductToCart(product.id)
   }
 
   async m_checkoutButtonOnClick(): Promise<void> {

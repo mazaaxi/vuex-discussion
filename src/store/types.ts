@@ -1,4 +1,3 @@
-import {Module} from 'vuex'
 import {Product as APIProduct} from '@/api'
 
 //----------------------------------------------------------------------
@@ -7,23 +6,13 @@ import {Product as APIProduct} from '@/api'
 //
 //----------------------------------------------------------------------
 
-export interface RootState {
-  counter: CounterModule
-  product: ProductModule
-  cart: CartModule
-}
-
 export interface ProductState {
   all: Product[]
 }
 
 export interface CartState {
-  items: Array<{id: string; quantity: number}>
+  items: CartItem[]
   checkoutStatus: CheckoutStatus
-}
-
-export interface CounterState {
-  counter: number
 }
 
 //----------------------------------------------------------------------
@@ -32,74 +21,36 @@ export interface CounterState {
 //
 //----------------------------------------------------------------------
 
-export interface ProductModule extends Module<ProductState, RootState> {}
+export interface Store {
+  product: ProductModule
 
-export interface CartModule extends Module<CartState, RootState> {}
-
-export interface CounterModule extends Module<CounterState, RootState> {}
-
-//----------------------------------------------------------------------
-//
-//  Types
-//
-//----------------------------------------------------------------------
-
-export namespace ProductTypes {
-  export const PATH = 'product'
-
-  export const ALL_PRODUCTS = 'allProducts'
-
-  export type allProducts = Product[]
-
-  export const GET_PRODUCT_BY_ID = 'getProductById'
-
-  export type getProductById = (productId: string) => Product | undefined
-
-  export const PULL_ALL_PRODUCTS = 'pullAllProducts'
-
-  export type pullAllProducts = () => Promise<void>
-
-  export const SET_PRODUCTS = 'setProducts'
-
-  export type setProducts = (products: Product[]) => void
-
-  export const DECREMENT_INVENTORY = 'decrementInventory'
+  cart: CartModule
 }
 
-export namespace CartTypes {
-  export const PATH = 'cart'
+export interface ProductModule {
+  all: Product[]
 
-  export const CHECKOUT_STATUS = 'checkoutStatus'
+  getById(productId: string): Product | undefined
 
-  export type checkoutStatus = CheckoutStatus
+  setAll(products: Product[]): void
 
-  export const CART_ITEMS = 'cartItems'
+  decrementInventory(productId: string): void
+}
 
-  export type cartItems = CartItem[]
+export interface CartModule {
+  items: CartItem[]
 
-  export const CART_TOTAL_PRICE = 'cartTotalPrice'
+  totalPrice: number
 
-  export type cartTotalPrice = number
+  checkoutStatus: CheckoutStatus
 
-  export const GET_CART_ITEM_BY_ID = 'getCartItemById'
+  setItems(items: CartItem[]): void
 
-  export type getCartItemById = (productId: string) => CartItem | undefined
+  setCheckoutStatus(status: CheckoutStatus): void
 
-  export const CHECKOUT = 'checkout'
+  addProductToCart(product: Product): void
 
-  export type checkout = () => Promise<void>
-
-  export const ADD_PRODUCT_TO_CART = 'addProductToCart'
-
-  export type addProductToCart = (productId: string) => Promise<void>
-
-  export const SET_CART_ITEMS = 'setCartItems'
-
-  export const SET_CHECKOUT_STATUS = 'setCheckoutStatus'
-
-  export const PUSH_PRODUCT_TO_CART = 'pushProductToCart'
-
-  export const INCREMENT_ITEM_QUANTITY = 'incrementItemQuantity'
+  incrementItemQuantity(productId: string): void
 }
 
 //----------------------------------------------------------------------

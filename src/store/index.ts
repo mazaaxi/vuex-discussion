@@ -1,16 +1,23 @@
 import Vue from 'vue'
-import Vuex, {StoreOptions} from 'vuex'
-import {CartTypes, ProductTypes, RootState} from '@/store/types'
-import {cartModule} from '@/store/modules/cart'
-import {productModule} from '@/store/modules/product'
+import {Component} from 'vue-property-decorator'
+import {CartModule, ProductModule, Store} from '@/store/types'
+import {CartModuleImpl} from '@/store/modules/cart'
+import {ProductModuleImpl} from '@/store/modules/product'
 
-Vue.use(Vuex)
+@Component
+export class StoreImpl extends Vue implements Store {
+  m_product = new ProductModuleImpl()
 
-export const store = new Vuex.Store<RootState>({
-  modules: {
-    [ProductTypes.PATH]: productModule,
-    [CartTypes.PATH]: cartModule,
-  },
-} as StoreOptions<RootState>)
+  get product(): ProductModule {
+    return this.m_product
+  }
 
+  m_cart = new CartModuleImpl()
+
+  get cart(): CartModule {
+    return this.m_cart
+  }
+}
+
+export const store: Store = new StoreImpl()
 export * from './types'
