@@ -37,11 +37,19 @@ import {CartTypes, CheckoutStatus, Product, ProductTypes} from '@/store'
 
 @Component({
   computed: {
-    ...mapGetters(ProductTypes.PATH, [ProductTypes.ALL_PRODUCTS]),
-    ...mapGetters(CartTypes.PATH, [CartTypes.CART_ITEMS, CartTypes.CART_TOTAL_PRICE, CartTypes.CHECKOUT_STATUS]),
+    ...mapGetters(ProductTypes.PATH, {
+      allProducts: ProductTypes.ALL,
+    }),
+    ...mapGetters(CartTypes.PATH, {
+      cartItems: CartTypes.ITEMS,
+      cartTotalPrice: CartTypes.TOTAL_PRICE,
+      checkoutStatus: CartTypes.CHECKOUT_STATUS,
+    }),
   },
   methods: {
-    ...mapActions(ProductTypes.PATH, [ProductTypes.PULL_ALL_PRODUCTS]),
+    ...mapActions(ProductTypes.PATH, {
+      pullAllProducts: ProductTypes.PULL_ALL,
+    }),
     ...mapActions(CartTypes.PATH, [CartTypes.ADD_PRODUCT_TO_CART, CartTypes.CHECKOUT]),
   },
 })
@@ -50,7 +58,7 @@ export default class ShoppingPage extends Vue {
 
   addProductToCart!: CartTypes.addProductToCart
 
-  pullAllProducts!: ProductTypes.pullAllProducts
+  pullAllProducts!: ProductTypes.pullAll
 
   checkout!: CartTypes.checkout
 

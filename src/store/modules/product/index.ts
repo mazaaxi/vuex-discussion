@@ -10,11 +10,11 @@ export const productModule = new class implements ProductModule {
   }
 
   getters: GetterTree<ProductState, RootState> = {
-    [ProductTypes.ALL_PRODUCTS](state): Product[] {
+    [ProductTypes.ALL](state): Product[] {
       return state.all
     },
 
-    [ProductTypes.GET_PRODUCT_BY_ID](state) {
+    [ProductTypes.GET_BY_ID](state) {
       return (productId: string) => {
         const product = state.all.find(item => item.id === productId)
         return product
@@ -23,7 +23,7 @@ export const productModule = new class implements ProductModule {
   }
 
   mutations: MutationTree<ProductState> = {
-    [ProductTypes.SET_PRODUCTS](state, products: Product[]): void {
+    [ProductTypes.SET_ALL](state, products: Product[]): void {
       state.all = products
     },
 
@@ -36,9 +36,9 @@ export const productModule = new class implements ProductModule {
   }
 
   actions: ActionTree<ProductState, RootState> = {
-    async [ProductTypes.PULL_ALL_PRODUCTS](context): Promise<void> {
+    async [ProductTypes.PULL_ALL](context): Promise<void> {
       const products = await api.shop.getProducts()
-      context.commit(ProductTypes.SET_PRODUCTS, products)
+      context.commit(ProductTypes.SET_ALL, products)
     },
   }
 }()

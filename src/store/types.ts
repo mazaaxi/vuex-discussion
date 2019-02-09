@@ -18,7 +18,7 @@ export interface ProductState {
 }
 
 export interface CartState {
-  items: Array<{id: string; quantity: number}>
+  items: CartItem[]
   checkoutStatus: CheckoutStatus
 }
 
@@ -47,19 +47,19 @@ export interface CounterModule extends Module<CounterState, RootState> {}
 export namespace ProductTypes {
   export const PATH = 'product'
 
-  export const ALL_PRODUCTS = 'allProducts'
+  export const ALL = 'all'
 
-  export type allProducts = Product[]
+  export type all = Product[]
 
-  export const GET_PRODUCT_BY_ID = 'getProductById'
+  export const GET_BY_ID = 'getById'
 
-  export type getProductById = (productId: string) => Product | undefined
+  export type getById = (productId: string) => Product | undefined
 
-  export const PULL_ALL_PRODUCTS = 'pullAllProducts'
+  export const PULL_ALL = 'pullAll'
 
-  export type pullAllProducts = () => Promise<void>
+  export type pullAll = () => Promise<void>
 
-  export const SET_PRODUCTS = 'setProducts'
+  export const SET_ALL = 'setAll'
 
   export type setProducts = (products: Product[]) => void
 
@@ -73,17 +73,13 @@ export namespace CartTypes {
 
   export type checkoutStatus = CheckoutStatus
 
-  export const CART_ITEMS = 'cartItems'
+  export const ITEMS = 'items'
 
   export type cartItems = CartItem[]
 
-  export const CART_TOTAL_PRICE = 'cartTotalPrice'
+  export const TOTAL_PRICE = 'totalPrice'
 
-  export type cartTotalPrice = number
-
-  export const GET_CART_ITEM_BY_ID = 'getCartItemById'
-
-  export type getCartItemById = (productId: string) => CartItem | undefined
+  export type totalPrice = number
 
   export const CHECKOUT = 'checkout'
 
@@ -93,7 +89,7 @@ export namespace CartTypes {
 
   export type addProductToCart = (productId: string) => Promise<void>
 
-  export const SET_CART_ITEMS = 'setCartItems'
+  export const SET_ITEMS = 'setItems'
 
   export const SET_CHECKOUT_STATUS = 'setCheckoutStatus'
 
@@ -104,7 +100,7 @@ export namespace CartTypes {
 
 //----------------------------------------------------------------------
 //
-//  Entities
+//  Data types
 //
 //----------------------------------------------------------------------
 
