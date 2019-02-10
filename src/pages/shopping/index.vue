@@ -33,12 +33,12 @@
 <script lang="ts">
 import {Component, Vue} from 'vue-property-decorator'
 import {mapActions, mapGetters} from 'vuex'
-import {CartTypes, CheckoutStatus, Product, ProductTypes} from '@/store'
+import {CartTypes, CheckoutStatus, Product, ProductsTypes} from '@/store'
 
 @Component({
   computed: {
-    ...mapGetters(ProductTypes.PATH, {
-      allProducts: ProductTypes.ALL,
+    ...mapGetters(ProductsTypes.PATH, {
+      allProducts: ProductsTypes.ALL,
     }),
     ...mapGetters(CartTypes.PATH, {
       cartItems: CartTypes.ITEMS,
@@ -47,8 +47,8 @@ import {CartTypes, CheckoutStatus, Product, ProductTypes} from '@/store'
     }),
   },
   methods: {
-    ...mapActions(ProductTypes.PATH, {
-      pullAllProducts: ProductTypes.PULL_ALL,
+    ...mapActions(ProductsTypes.PATH, {
+      pullAllProducts: ProductsTypes.PULL_ALL,
     }),
     ...mapActions(CartTypes.PATH, [CartTypes.ADD_PRODUCT_TO_CART, CartTypes.CHECKOUT]),
   },
@@ -58,7 +58,7 @@ export default class ShoppingPage extends Vue {
 
   addProductToCart!: CartTypes.addProductToCart
 
-  pullAllProducts!: ProductTypes.pullAll
+  pullAllProducts!: ProductsTypes.pullAll
 
   checkout!: CartTypes.checkout
 

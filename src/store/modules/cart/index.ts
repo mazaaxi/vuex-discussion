@@ -1,4 +1,4 @@
-import {CartModule, CartState, RootState, CartItem, CartTypes, CheckoutStatus, Product, ProductState, ProductTypes} from '@/store/types'
+import {CartModule, CartState, RootState, CartItem, CartTypes, CheckoutStatus, Product, ProductsState, ProductsTypes} from '@/store/types'
 import {GetterTree, MutationTree, ActionTree} from 'vuex'
 import {api} from '@/api'
 
@@ -16,7 +16,7 @@ export const cartModule = new class implements CartModule {
     },
 
     [CartTypes.ITEMS](state, getters, rootState): CartItem[] {
-      const allProducts = (rootState.product as ProductState).all
+      const allProducts = (rootState.products as ProductsState).all
       return state.items.map(({id, quantity}) => {
         const product = allProducts.find(item => item.id === id)!
         return {
@@ -74,7 +74,7 @@ export const cartModule = new class implements CartModule {
           context.commit(CartTypes.INCREMENT_ITEM_QUANTITY, product.id)
         }
         // 在庫を1つ減らす
-        context.commit(`${ProductTypes.PATH}/${ProductTypes.DECREMENT_INVENTORY}`, productId, {root: true})
+        context.commit(`${ProductsTypes.PATH}/${ProductsTypes.DECREMENT_INVENTORY}`, productId, {root: true})
       }
     },
 
@@ -93,7 +93,7 @@ export const cartModule = new class implements CartModule {
 }()
 
 function getProductById(rootGetters: any, productId: string): Product {
-  const path = `${ProductTypes.PATH}/${ProductTypes.GET_BY_ID}`
+  const path = `${ProductsTypes.PATH}/${ProductsTypes.GET_BY_ID}`
   const result = rootGetters[path](productId) as Product | undefined
   if (!result) {
     throw new Error(`A Product that matches the specified productId "${productId}" was not found.`)

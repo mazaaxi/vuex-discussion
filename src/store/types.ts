@@ -8,12 +8,11 @@ import {Product as APIProduct} from '@/api'
 //----------------------------------------------------------------------
 
 export interface RootState {
-  counter: CounterModule
-  product: ProductModule
-  cart: CartModule
+  [ProductsTypes.PATH]: ProductsModule
+  [CartTypes.PATH]: CartModule
 }
 
-export interface ProductState {
+export interface ProductsState {
   all: Product[]
 }
 
@@ -32,11 +31,9 @@ export interface CounterState {
 //
 //----------------------------------------------------------------------
 
-export interface ProductModule extends Module<ProductState, RootState> {}
+export interface ProductsModule extends Module<ProductsState, RootState> {}
 
 export interface CartModule extends Module<CartState, RootState> {}
-
-export interface CounterModule extends Module<CounterState, RootState> {}
 
 //----------------------------------------------------------------------
 //
@@ -44,8 +41,8 @@ export interface CounterModule extends Module<CounterState, RootState> {}
 //
 //----------------------------------------------------------------------
 
-export namespace ProductTypes {
-  export const PATH = 'product'
+export namespace ProductsTypes {
+  export const PATH = 'products'
 
   export const ALL = 'all'
 
