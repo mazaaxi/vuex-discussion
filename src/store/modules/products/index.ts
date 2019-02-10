@@ -1,9 +1,9 @@
 import Vue from 'vue'
 import {Component} from 'vue-property-decorator'
-import {Product, ProductModule, ProductState} from '@/store/types'
+import {Product, ProductsModule, ProductState} from '@/store/types'
 
 @Component
-export class ProductModuleImpl extends Vue implements ProductModule {
+export class ProductsModuleImpl extends Vue implements ProductsModule {
   m_state: ProductState = {
     all: [],
   }

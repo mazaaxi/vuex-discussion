@@ -22,12 +22,12 @@ export interface CartState {
 //----------------------------------------------------------------------
 
 export interface Store {
-  product: ProductModule
+  products: ProductsModule
 
   cart: CartModule
 }
 
-export interface ProductModule {
+export interface ProductsModule {
   all: Product[]
 
   getById(productId: string): Product | undefined

@@ -7,12 +7,12 @@ import {CartItem, CheckoutStatus, Product, ShopLogic} from '@/logic/types'
 @Component
 export class ShopLogicImpl extends Vue implements ShopLogic {
   get allProducts(): Product[] {
-    return store.product.all
+    return store.products.all
   }
 
   async pullAllProducts(): Promise<void> {
     const products = await api.shop.getProducts()
-    store.product.setAll(products)
+    store.products.setAll(products)
   }
 
   get cartItems(): CartItem[] {
@@ -38,7 +38,7 @@ export class ShopLogicImpl extends Vue implements ShopLogic {
         store.cart.incrementItemQuantity(productId)
       }
       // 在庫を1つ減らす
-      store.product.decrementInventory(productId)
+      store.products.decrementInventory(productId)
     }
   }
 
@@ -54,7 +54,7 @@ export class ShopLogicImpl extends Vue implements ShopLogic {
   }
 
   m_getProductById(productId: string): Product {
-    const result = store.product.getById(productId)
+    const result = store.products.getById(productId)
     if (!result) {
       throw new Error(`A Product that matches the specified productId "${productId}" was not found.`)
     }

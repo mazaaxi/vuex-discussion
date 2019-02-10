@@ -1,14 +1,14 @@
 import Vue from 'vue'
 import {Component} from 'vue-property-decorator'
-import {CartModule, ProductModule, Store} from '@/store/types'
+import {CartModule, ProductsModule, Store} from '@/store/types'
 import {CartModuleImpl} from '@/store/modules/cart'
-import {ProductModuleImpl} from '@/store/modules/product'
+import {ProductsModuleImpl} from '@/store/modules/products'
 
 @Component
 export class StoreImpl extends Vue implements Store {
-  m_product = new ProductModuleImpl()
+  m_product = new ProductsModuleImpl()
 
-  get product(): ProductModule {
+  get products(): ProductsModule {
     return this.m_product
   }
 
