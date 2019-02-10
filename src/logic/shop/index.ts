@@ -1,18 +1,18 @@
 import Vue from 'vue'
 import {Component} from 'vue-property-decorator'
 import {store} from '@/store'
-import {ProductTypes, CartTypes} from '@/store/types'
-import {Product, CartItem, CheckoutStatus} from '@/logic/types'
+import {CartTypes, ProductsTypes} from '@/store/types'
+import {CartItem, CheckoutStatus, Product} from '@/logic/types'
 import {ShopLogic} from '@/logic/types'
 
 @Component
 export class ShopLogicImpl extends Vue implements ShopLogic {
   get allProducts(): Product[] {
-    return store.getters[`${ProductTypes.PATH}/${ProductTypes.ALL}`]
+    return store.getters[`${ProductsTypes.PATH}/${ProductsTypes.ALL}`]
   }
 
   pullAllProducts(): Promise<void> {
-    return store.dispatch(`${ProductTypes.PATH}/${ProductTypes.PULL_ALL}`)
+    return store.dispatch(`${ProductsTypes.PATH}/${ProductsTypes.PULL_ALL}`)
   }
 
   get cartItems(): CartItem[] {

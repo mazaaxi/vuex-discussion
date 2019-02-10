@@ -1,14 +1,14 @@
 import Vue from 'vue'
 import Vuex, {StoreOptions} from 'vuex'
-import {CartTypes, ProductTypes, RootState} from '@/store/types'
+import {CartTypes, ProductsTypes, RootState} from '@/store/types'
+import {productsModule} from '@/store/modules/products'
 import {cartModule} from '@/store/modules/cart'
-import {productModule} from '@/store/modules/product'
 
 Vue.use(Vuex)
 
 export const store = new Vuex.Store<RootState>({
   modules: {
-    [ProductTypes.PATH]: productModule,
+    [ProductsTypes.PATH]: productsModule,
     [CartTypes.PATH]: cartModule,
   },
 } as StoreOptions<RootState>)
