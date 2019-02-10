@@ -72,7 +72,7 @@ export namespace CartTypes {
 
   export const ITEMS = 'items'
 
-  export type cartItems = CartItem[]
+  export type items = CartItem[]
 
   export const TOTAL_PRICE = 'totalPrice'
 
