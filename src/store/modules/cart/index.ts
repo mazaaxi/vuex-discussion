@@ -1,4 +1,4 @@
-import {CartModule, CartState, RootState, CartItem, CartTypes, CheckoutStatus, Product, ProductsState, ProductsTypes} from '@/store/types'
+import {CartItem, CartModule, CartState, CartTypes, CheckoutStatus, Product, ProductsTypes, RootState} from '@/store/types'
 import {GetterTree, MutationTree, ActionTree} from 'vuex'
 import {api} from '@/api'
 
@@ -15,17 +15,8 @@ export const cartModule = new class implements CartModule {
       return state.checkoutStatus
     },
 
-    [CartTypes.ITEMS](state, getters, rootState): CartItem[] {
-      const allProducts = (rootState.products as ProductsState).all
-      return state.items.map(({id, quantity}) => {
-        const product = allProducts.find(item => item.id === id)!
-        return {
-          id: product.id,
-          title: product.title,
-          price: product.price,
-          quantity,
-        }
-      })
+    [CartTypes.ITEMS](state): CartItem[] {
+      return state.items
     },
 
     [CartTypes.TOTAL_PRICE](state, getters): number {
