@@ -1,0 +1,35 @@
+@startuml{OnlyBox.png}
+
+class ProductState {
+  +all: Product[]
+}
+
+class ProductModule {
+  +all: Product[]
+  +getAll(): Promise<void>
+  +getById(productId: string): Product
+  +decrementInventory(productId: number): void
+}
+
+class CartState {
+  +items: CartItem[]
+  +checkoutStatus: CheckoutStatus
+}
+
+class CartModule {
+  +checkoutStatus: CheckoutStatus
+  +items: CartItem[]
+  +totalPrice: number
+  +setItems(items: CartItem[]): void
+  +setCheckoutStatus(status: CheckoutStatus): void
+  +pushProductToCart(product Product): void
+  +incrementItemQuantity(productId: string): void
+  +checkout(): Promise<void>
+  +addProductToCart(productId: string): Promise<void>
+}
+
+ProductModule *-d- ProductState
+CartModule *-d- CartState
+CartModule -l-> ProductModule
+
+@enduml
