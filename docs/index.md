@@ -78,7 +78,7 @@ Vuex には重要な単語がいくつかありますが、最初はこの単語
 
 次はゲッターで使用するストア用定義の一部になります。
 
-```js
+```ts
 export namespace CartTypes {
   export const PATH = 'cart'
 
@@ -94,7 +94,7 @@ export namespace CartTypes {
 
 ここでは`cart`モジュールの`items`というゲッターを`cartItems`という名前で使用するよう定義しています。
 
-```js
+```ts
 import {mapGetters} from 'vuex'
 import {CartTypes} from '@/store'
 
@@ -120,11 +120,11 @@ export default class ShoppingPage extends Vue {
 
 ### ミューテーションまたはアクションを利用する
 
-ミューテーションとアクションもゲッターと使い方はほぼ同じで、違いとしては、`mapMutations`、`mapActions`は`methods`に記述する必要があるといった部分だけになります。
+ミューテーションとアクションもゲッターと使い方はほぼ同じで、違いとしては、`mapMutations`、`mapActions`は`methods`に記述するといった部分だけになります。
 
-次はアクションで使用する定義の抜粋になります。
+次はアクションで使用するストア定義の抜粋になります。
 
-```js
+```ts
 export namespace CartTypes {
   export const PATH = 'cart'
 
@@ -136,11 +136,11 @@ export namespace CartTypes {
 
 次は画面からアクションを利用するためのコードです。
 
-`mapGetters`は`computed`に記述する必要があります。
+`mapActions`は`methods`に記述する必要があります。
 
 ここでは`cart`モジュールの`addProductToCart`というアクションをそのままの名前(`addProductToCart`)で使用するよう定義しています。
 
-```js
+```ts
 import {mapActions} from 'vuex'
 import {CartTypes} from '@/store'
 
@@ -178,7 +178,7 @@ export default class ShoppingPage extends Vue {
 
 #### 適切な引数を渡すことができる
 
-```js
+```ts
 export default class ShoppingPage extends Vue {
 
   addProductToCart!: CartTypes.addProductToCart
@@ -192,8 +192,8 @@ export default class ShoppingPage extends Vue {
 
 例えば誤って number 型の値を引数に渡すとコンパイルエラーが発生します。
 
-```js
-this.addProductToCart(999);
+```ts
+this.addProductToCart(999)
 ```
 
 また型定義されていることにより、利用者はメソッドの引数に「商品 ID を number 型で渡せばいいんだな」と明確に知ることができます。
@@ -222,7 +222,7 @@ this.addProductToCart(999);
 
 現時点ではストアの利用には理解しづらいお作法に従う必要があり、直感的ではありません。
 
-ストアは利用者に対してもっと分かりやすく、使いやすいインターフェイスを提供する義務があります。
+ストアは利用者に対してもっと分かりやすく、使いやすいインターフェイスを提供するべきです。
 
 ここではストアにアクセスしやすいインターフェイスの作成について説明していきます。
 
@@ -248,9 +248,9 @@ this.addProductToCart(999);
 </p>
 ```
 
-```js
+```ts
 async m_addButtonOnClick(product: Product): Promise<void> {
-  await this.$logic.shop.addProductToCart(product.id);
+  await this.$logic.shop.addProductToCart(product.id)
 }
 ```
 
@@ -264,20 +264,20 @@ async m_addButtonOnClick(product: Product): Promise<void> {
 
 次はショップロジックの一部抜粋です。
 
-```js
-import { store } from "@/store";
+```ts
+import {store} from "@/store"
 
 @Component
 export class ShopLogicImpl extends Vue implements ShopLogic {
   get cartItems(): CartItem[] {
-    return store.getters[`${CartTypes.PATH}/${CartTypes.ITEMS}`];
+    return store.getters[`${CartTypes.PATH}/${CartTypes.ITEMS}`]
   }
 
   addProductToCart(productId: string): Promise<void> {
     return store.dispatch(
       `${CartTypes.PATH}/${CartTypes.ADD_PRODUCT_TO_CART}`,
       productId
-    );
+    )
   }
 }
 ```
@@ -286,35 +286,35 @@ export class ShopLogicImpl extends Vue implements ShopLogic {
 
 次のコードはロジックのコンテナをどの画面からでも簡単にアクセスできるようにしています。
 
-```js
+```ts
 interface Logic {
-  shop: ShopLogic;
+  shop: ShopLogic
 }
 ```
 
-```js
+```ts
 class LogicImpl implements Logic {
   constructor() {
-    this.m_shop = new ShopLogicImpl();
+    this.m_shop = new ShopLogicImpl()
   }
 
-  m_shop: ShopLogic;
+  m_shop: ShopLogic
 
   get shop(): ShopLogic {
-    return this.m_shop;
+    return this.m_shop
   }
 }
 
-export const logic: Logic = new LogicImpl();
+export const logic: Logic = new LogicImpl()
 Object.defineProperty(Vue.prototype, "$logic", {
   value: logic,
   writable: false
-});
+})
 ```
 
 `src/types/vue.d.ts`
 
-```js
+```ts
 import 'vue'
 import {Logic} from '@/logic'
 
@@ -361,8 +361,8 @@ Vuex によるストアの実装ではタイプセーフにならない箇所が
 
 次はミューテーション実装のコードを抜粋したものです。
 
-```js
-context.commit(CartTypes.INCREMENT_ITEM_QUANTITY, product.id);
+```ts
+context.commit(CartTypes.INCREMENT_ITEM_QUANTITY, product.id)
 ```
 
 このコードは`incrementItemQuantity`というミューテーションに`product.id`を引数として渡しています。
@@ -379,7 +379,7 @@ Vuex の実装は数々のお作法に従う必要があり、その作法を知
 
 次のコードはあるアクションの実装を行っています。
 
-```js
+```ts
 actions: ActionTree<CartState, RootState> = {
 
   // 1. アクションが受け取る引数の作法
@@ -432,30 +432,30 @@ Vuex で実装されていたモジュールを Vue コンポーネントへ置�
 
 次は Vue コンポーネント化したモジュールの一部抜粋です。
 
-```js
+```ts
 export interface CartState {
   items: CartItem[]
   checkoutStatus: CheckoutStatus
 }
 ```
 
-```js
-import Vue from "vue";
-import { Component } from "vue-property-decorator";
+```ts
+import Vue from "vue"
+import { Component } from "vue-property-decorator"
 
 @Component
 export class CartModuleImpl extends Vue implements CartModule {
   m_state: CartState = {
     items: [],
     checkoutStatus: CheckoutStatus.None
-  };
+  }
 
   get items(): CartItem[] {
-    return this.m_state.items;
+    return this.m_state.items
   }
 
   setCheckoutStatus(status: CheckoutStatus): void {
-    this.m_state.checkoutStatus = status;
+    this.m_state.checkoutStatus = status
   }
 }
 ```
@@ -507,7 +507,7 @@ export class CartModuleImpl extends Vue implements CartModule {
 
 次はショップロジックの一部抜粋です。
 
-```js
+```ts
 addProductToCart(productId: string): void {
   store.cart.setCheckoutStatus(CheckoutStatus.None)
   const product = store.products.getById(productId)
