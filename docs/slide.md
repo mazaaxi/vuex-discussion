@@ -77,7 +77,7 @@ Vuex には重要な単語がいくつかありますが、最初はこの単語
 
 ## アクション
 
-アクションは非同期なデータの取得、編集機能を提供します。
+アクションは<span style="color: red;">非同期</span>なデータの取得、編集機能を提供します。
 
 例えば REST API のように非同期でデータを取得、編集するような場合が対象となります。
 
@@ -113,7 +113,9 @@ Vuex には重要な単語がいくつかありますが、最初はこの単語
 
 ストアは完了しているので、画面からストアを利用する方法を見ていきましょう。
 
-> 「ふ〜ん、そんな感じで実装するんだ」みたいな軽い気持ちで聞いてもらってOKです！
+<!--
+「ふ〜ん、そんな感じで実装するんだ」みたいな軽い気持ちで聞いてもらってOKです！
+-->
 
 ---
 
@@ -127,7 +129,7 @@ Vuex には重要な単語がいくつかありますが、最初はこの単語
 
 今回せっかく TypeScript を使用するので、タイプセーフ（型安全）にストアを利用するためのストア用定義ファイルを作成しました。
 
-次はゲッターで使用するストア用定義の一部になります。
+次はゲッターで使用するストア用定義の抜粋になります。
 
 ```ts
 export namespace CartTypes {
@@ -189,11 +191,9 @@ export default class ShoppingPage extends Vue {
 export namespace CartTypes {
   export const PATH = 'cart'
 
-  export const ADD_PRODUCT_TO_CART =
-    'addProductToCart'
+  export const ADD_PRODUCT_TO_CART = 'addProductToCart'
 
-  export type addProductToCart =
-    (productId: string) => Promise<void>
+  export type addProductToCart = (productId: string) => Promise<void>
 }
 ```
 
@@ -289,7 +289,7 @@ this.addProductToCart(999);
 
 ---
 
-### ストアにアクセスするための作法が多すぎる
+### ストアにアクセスするためのお作法が多すぎる
 
 画面からストアにアクセスするには`mapGetters`などを記述したり、さらにクラスからのアクセスではインスタンス変数を定義する必要があります。
 
@@ -297,9 +297,9 @@ this.addProductToCart(999);
 
 ---
 
-### ストアにアクセスするためのコードが多すぎる
+### ストアにアクセスするためのコードが毎回必要
 
-画面からストアにアクセスするには、お作法に従ったコーディングを各画面でする必要があり、毎回同じようなコードを記述することになります。
+画面からストアにアクセスするには、作法に従ったコーディングを各画面でする必要があり、毎回同じようなコードを記述することになります。
 
 ---
 
@@ -309,7 +309,7 @@ this.addProductToCart(999);
 
 ---
 
-## ストアへのアクセス方法を改善する
+# ストアへのアクセス方法を改善する
 
 現時点ではストアの利用には理解しづらいお作法に従う必要があり、直感的ではありません。
 
@@ -319,7 +319,7 @@ this.addProductToCart(999);
 
 ---
 
-### Vuex のお作法を吸収する
+## Vuex のお作法を吸収する
 
 画面からストアにアクセスするには Vuex のお作法と TypeScript が組み合わさり、非常に分かりづらいコーディングを行う必要がありました。
 
@@ -340,6 +340,14 @@ this.addProductToCart(999);
 
 この結果、画面からストアへのアクセスは次のように改善されました。
 
+<!--
+今回の改善により、画面では Vuex のお作法に従ったコーディングを一切する必要はありません。ストアへのアクセスはすべて`$logic`から行うことができます。
+
+試しに VSCode や WebStorm などの IDE で`this.$logic.`とタイプしてください。すると`shop`という候補が現れます。さらにドット（`.`）をタイプすると利用可能なゲッターやメソッドが表示されます。
+-->
+
+<span style="font-size:22px">
+
 ```html
 <p v-show="!$logic.shop.cartItems.length">
   <i>Please add some products to cart.</i>
@@ -351,11 +359,8 @@ async m_addButtonOnClick(product: Product): Promise<void> {
   await this.$logic.shop.addProductToCart(product.id);
 }
 ```
-<!--
-今回の改善により、画面では Vuex のお作法に従ったコーディングを一切する必要はありません。ストアへのアクセスはすべて`$logic`から行うことができます。
 
-試しに VSCode や WebStorm などの IDE で`this.$logic.`とタイプしてください。すると`shop`という候補が現れます。さらにドット（`.`）をタイプすると利用可能なゲッターやメソッドが表示されます。
--->
+</span>
 
 ---
 
@@ -388,7 +393,7 @@ export class ShopLogicImpl extends Vue implements ShopLogic
 
 ---
 
-次のコードはロジックのコンテナをどの画面からでも簡単にアクセスできるようにしています。
+次のコードはロジックをどの画面からでも簡単にアクセスできるようにしています。
 
 <span style="font-size:16px">
 
@@ -400,11 +405,7 @@ interface Logic {
 
 ```ts
 class LogicImpl implements Logic {
-  constructor() {
-    this.m_shop = new ShopLogicImpl()
-  }
-
-  m_shop: ShopLogic
+  m_shop: ShopLogic = new ShopLogicImpl()
 
   get shop(): ShopLogic {
     return this.m_shop
@@ -433,11 +434,11 @@ declare module 'vue/types/vue' {
 
 ---
 
-### 改善された点
+## 改善された点
 
 ---
 
-#### コーディングの量と複雑性が減少した
+### コーディングの量と複雑性が減少した
 
 画面から Vuex のお作法に必要なコードがすべて排除されたため、かなりコーディング量を削減することができました。
 
@@ -445,7 +446,7 @@ declare module 'vue/types/vue' {
 
 ---
 
-#### 直感的にストアにアクセスできるようになった
+### 直感的にストアにアクセスできるようになった
 
 改善前はストアを利用するには、ストアで提供されているゲッター、ミューテーション、アクションを調べ、それを画面に定義し、やっとストアにアクセスすることができました。
 
@@ -453,7 +454,7 @@ declare module 'vue/types/vue' {
 
 ---
 
-#### 画面が Vuex に依存しなくなった
+### 画面が Vuex に依存しなくなった
 
 Vuex に依存するコードがロジックに吸収されたことにより、画面は Vuex に依存しなくなりました。画面はストアの実装がどのようなライブラリを使用しているかを知りません。
 
@@ -499,26 +500,29 @@ context.commit(CartTypes.INCREMENT_ITEM_QUANTITY, product.id)
 
 <span style="font-size:16px">
 
-Vuex の実装は数々のお作法に従う必要があり、その作法を知らないと実装することはできません。
-例として Vuex のストア実装とその作法がどのようなものか見てみましょう。
+Vuex の実装は数々のお作法に従う必要があり、そのお作法を知らないと実装することはできません。
+例として Vuex のストア実装とそのお作法がどのようなものか見てみましょう。
 
 次のコードはあるアクションの実装を行っています。
 
 <!--
-1. アクションは第 1 引数に`context`を受け取り、第 2 引数に任意の引数を受け取ります。今回は引き数が 1 つなのでよいのですが、2 つ以上になる場合はオブジェクト形式で受け取る必要があります。
-2. アクションはステートの編集ができません。ステートの編集はミューテーションに依頼する必要があります。ミューテーションの呼び出しは`commit()`を使用します（アクションの呼び出しの場合は`dispatch()`を使用します）。
+1. アクション（やミューテーション、ゲッター）は受け取る引数に決まりがあります。アクションの場合は、第 1 引数に`context`を受け取り、第 2 引数に任意の引数を受け取ります。今回は引き数が 1 つなのでよいのですが、2 つ以上になる場合はオブジェクト形式で受け取る必要があります。
+
+2. アクションはステートの編集ができません。ステートの編集はミューテーションに依頼する必要があります。ミューテーションの呼び出しは`commit()`を使用します（ちなみにアクションの呼び出しの場合は`dispatch()`を使用します）。
+
 3. 他のモジュールのゲッターへのアクセスは`context.rootGetters`経由で行います。`rootGetters`に対象となるゲッターのフルパス(`"products/getById"`)を指定することで対象のゲッターを使用することができます。ここでは引き数を受け取るゲッターを利用しているので、引き数に商品 ID を渡しています。
+
 4. ここでは他のモジュールのミューテーションを呼び出す必要があるので、フルパス（`"products/decrementInventory"`）を指定しています。またフルパスを指定するにはオプションに`{root: true}`を指定する必要があります。
 -->
 
 ```ts
 actions: ActionTree<CartState, RootState> = {
 
-  // 1. アクションが受け取る引数の作法
+  // 1. アクションが受け取る引数のお作法
   async [CartTypes.ADD_PRODUCT_TO_CART](context, productId: string): Promise<void> {
-    // 2. ミューテーションの呼び出し作法
+    // 2. ミューテーションの呼び出しお作法
     context.commit(CartTypes.SET_CHECKOUT_STATUS, CheckoutStatus.None)
-    // 3. 他のモジュールのゲッターの呼び出し作法
+    // 3. 他のモジュールのゲッターの呼び出しお作法
     const product: Product | undefined =
       context.rootGetters[`${ProductsTypes.PATH}/${ProductsTypes.GET_BY_ID}`](productId)
     if (!product) {
@@ -531,7 +535,7 @@ actions: ActionTree<CartState, RootState> = {
       } else {
         context.commit(CartTypes.INCREMENT_ITEM_QUANTITY, product.id)
       }
-      // 4. 他のモジュールのミューテーションの呼び出し作法
+      // 4. 他のモジュールのミューテーションの呼び出しお作法
       context.commit(
         `${ProductsTypes.PATH}/${ProductsTypes.DECREMENT_INVENTORY}`,
         productId, {root: true}
@@ -542,8 +546,170 @@ actions: ActionTree<CartState, RootState> = {
 }
 ```
 
-このコードを Vuex の勉強を始めたばかりの人が読み解くのはそれなりに難しいと思いますが、Vuex を知らない人はほとんど分からないのではないでしょうか。
-
-勉強していないので分からないのはもちろんしょうがないことだと思いますが、文脈からある程度何をしているか分かるのが良いコードだと思います。
+Vuex のお作法で理解しづらい部分がノイズとなり、処理の流れを読みにくくしているように感じられます。
 
 </span>
+
+---
+
+# Vuex をやめる
+
+ここまでで示したように Vuex で実装することによりコードが複雑になるというデメリットがあります。
+
+幸いにも現時点で画面は Vuex に依存しなくなっているので、Vuex 以外のストア実装を選択することができます。
+
+ここでは Vuex をやめ、自前でストア実装する方法を説明していきます。
+
+---
+
+## モジュールを Vue コンポーネントへ置き換える
+
+Vuex で実装されていたモジュールを Vue コンポーネントへ置き換えます。
+
+次は Vue コンポーネント化したモジュールの一部抜粋です。
+
+<!--
+Vuex と同じようにモジュールはステートを保持します。今回は`m_state`という変数でステートを保持しています。
+
+このステートは外部から直接アクセスできないようにプライベートな変数という位置づけにしています。
+
+外部からステートにアクセスするには個別にゲッターなり、メソッドなりを提供し、これらを経由してステートにアクセスするようにしています。
+
+* `items`というゲッターで、カートに入っているアイテム一覧を提供します。
+* `setCheckoutStatus`というメソッド（Vuex でいうミューテーション）で、現在のチェックアウト状態を設定する機能を提供します。
+-->
+
+<span style="font-size:18px">
+
+```ts
+export interface CartState {
+  items: CartItem[]
+  checkoutStatus: CheckoutStatus
+}
+```
+
+```ts
+import Vue from "vue"
+import {Component} from "vue-property-decorator"
+
+@Component
+export class CartModuleImpl extends Vue implements CartModule {
+  m_state: CartState = {
+    items: [],
+    checkoutStatus: CheckoutStatus.None
+  }
+
+  get items(): CartItem[] {
+    return this.m_state.items
+  }
+
+  setCheckoutStatus(status: CheckoutStatus): void {
+    this.m_state.checkoutStatus = status
+  }
+}
+```
+
+</span>
+
+---
+
+## モジュール間の依存関係を取り除く
+
+ここまでの実装では、モジュールがいわゆるビジネスロジック（業務処理の塊）の実装を担っていました。ビジネスロジックは複数のモジュールを横断したり、API を呼び出す必要が生じます。
+
+このように複雑な処理はできれば共通的に利用できるようにし、重複したコードを書かないことが理想です。
+
+ただし共通的に利用できるビジネスロジックをモジュールに実装してしまうと、そのビジネスロジックを呼び出したいがためにモジュール間で相互依存の必要性が生じ、これが循環参照の原因になります。
+
+このような理由でモジュールのビジネスロジックに関わる部分はロジックへ移動させる必要があります。
+
+---
+
+そこで以下の修正を行いました。
+
+* モジュールで依存している箇所をショップロジック（`ShopLogic`）へ移動します。対象となるのは`CartModule.addProductToCart()`、`CartModule.checkout()`です。
+
+* API の呼び出し箇所をショップロジック（`ShopLogic`）へ移動します。対象となるのは`ProductsModule.pullAll()`です。
+
+この修正によりモジュールの役割がよりシンプルになりました。
+
+モジュールは自身が保持するステートを管理することに専念するのみで、他のモジュールや API に依存しません。これにより循環参照の心配がなくなりました。
+
+---
+
+次は依存関係を改善した後の図です。
+
+![150%](assets/img/dependency.png)
+
+---
+
+## 改善された点
+
+---
+
+### ストアの実装がタイプセーフになった
+
+ストアがタイプセーフになったことで IDE のコード補完の恩恵を受けることができるようになりました。
+
+`import {store} from '@/store'`でストアのインポートを行い、`store.`とタイプしてみてください。`product`、`cart`というように利用可能なモジュール一覧が表示されます。
+
+さらにドット（`.`）をタイプすると、そのモジュールで利用可能なゲッターやメソッドの一覧が表示され、直感的なコーディングが可能になります。
+
+またタイプセーフになったことで、ゲッターやメソッドの名前変更、メソッドのシグネチャ変更も安全に行うことができるようになりました。
+
+---
+
+### ストアの使い方が直感的に分かる
+
+次はショップロジックの一部抜粋です。
+
+<span style="font-size:18px">
+  
+```ts
+addProductToCart(productId: string): void {
+  store.cart.setCheckoutStatus(CheckoutStatus.None)
+  const product = store.products.getById(productId)
+  if (!product) {
+    throw new Error(
+      `A Product that matches the specified productId "${productId}" was not found.`
+    )
+  }
+  if (product.inventory > 0) {
+    const cartItem = store.cart.items.find(item => item.id === product.id)
+    if (!cartItem) {
+      store.cart.addProductToCart(product)
+    } else {
+      store.cart.incrementItemQuantity(productId)
+    }
+    store.products.decrementInventory(productId)
+  }
+}
+```
+</span>
+
+Vuex のお作法がなくなった分、ビジネスロジックの流れに集中できるようになり、どのような処理を行っているかが分かりやすくなったと思います。
+
+---
+
+### 依存関係を改善することができた
+
+依存関係を見直したことにより、循環参照の心配がなくなりました。
+
+これにより、仕様変更や機能追加の際に「このモジュールを参照すると循環参照になるんじゃないか…」といった心配をする必要がなくなり、安全かつ柔軟にコーディングできるようになりました。
+
+---
+
+# まとめ
+
+以上 Vuex を TypeScript で実装することで生じる課題とその解決案を提示してきました。
+
+実際にアプリケーションを作成する際は Vuex を採用することがほとんどでしょう。
+
+デファクトスタンダードな Vuex を採用する安心感もありますし、今後は Vuex が TypeScript でより実装しやすく改善されていくでしょう。
+
+ただ Vuex 以外の選択肢もあることが認識いただけたかと思います。
+
+今回の考察に異論はあると思いますが、それでもその考察が何かしらの役に立つことができたなら幸いです。
+
+
+
