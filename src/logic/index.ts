@@ -3,11 +3,7 @@ import {Logic, ShopLogic} from '@/logic/types'
 import {ShopLogicImpl} from '@/logic/shop'
 
 class LogicImpl implements Logic {
-  constructor() {
-    this.m_shop = new ShopLogicImpl()
-  }
-
-  m_shop: ShopLogic
+  m_shop: ShopLogic = new ShopLogicImpl()
 
   get shop(): ShopLogic {
     return this.m_shop
