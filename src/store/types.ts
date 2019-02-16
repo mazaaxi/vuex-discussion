@@ -1,5 +1,4 @@
 import {Module} from 'vuex'
-import {Product as APIProduct} from '@/api'
 
 //----------------------------------------------------------------------
 //
@@ -19,10 +18,6 @@ export interface ProductsState {
 export interface CartState {
   items: CartItem[]
   checkoutStatus: CheckoutStatus
-}
-
-export interface CounterState {
-  counter: number
 }
 
 //----------------------------------------------------------------------
@@ -83,7 +78,12 @@ export namespace CartTypes {
 //
 //----------------------------------------------------------------------
 
-export type Product = APIProduct
+export interface Product {
+  id: string
+  title: string
+  price: number
+  inventory: number
+}
 
 export interface CartItem {
   id: string
