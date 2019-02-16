@@ -1,5 +1,3 @@
-import {Product as APIProduct} from '@/api'
-
 //----------------------------------------------------------------------
 //
 //  States
@@ -59,7 +57,12 @@ export interface CartModule {
 //
 //----------------------------------------------------------------------
 
-export type Product = APIProduct
+export interface Product {
+  id: string
+  title: string
+  price: number
+  inventory: number
+}
 
 export interface CartItem {
   id: string
