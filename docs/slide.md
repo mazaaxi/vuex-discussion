@@ -11,9 +11,28 @@ Vuex を TypeScript で書くことにより生じる問題点とその解決案
 
 またタイプセーフ（型安全）で、直感的なコーディングができるよう提案と改善を行っていきます。
 
+<br>
+
+* Vuex とは
+<!--
+Vuex の概要とその必要性について説明します。
+-->
+* Vuex で重要な単語
+<!--
+Vuex で登場する重要な単語について説明します。
+-->
+* 画面からストアを利用する
+<!--
+画面からVuex のストアを利用するためのコーディングを見ながら説明します。
+-->
+* 画面からストアを利用する方法を改善する
+<!--
+画面からVuex のストアを利用するためのコーディングを改善します。
+-->
+
 ---
 
-# Vuex の必要性
+# Vuex とは
 
 ある規模のアプリケーションになると、アプリケーションで扱うデータを管理する必要性が生じます。
 
@@ -23,24 +42,23 @@ Vuex はこのようなアプリケーションのデータ管理をするため
 
 ## データ管理を行う必要性について
 
-今後 SPA でアプリケーションを作成する機会が増えていくと考えられます。
+![](assets/img/data-mgmt-issue-1.png)
 
-SPA では API でサーバーから取得したデータをクライアントサイドに保管し、そのデータを各画面で共有するケースが多々あります。
+<span style="font-size:22px">
 
-もし各画面で共有するデータを管理せず、その場しのぎで実装していくと間違いなくスパゲッティコード化していきます。
+このアプリケーションでは、各コンポーネントが別々のユーザー情報を参照しています。
 
----
+ここでユーザー情報を変更したとすると、各ユーザー情報も同時に変更する必要があります。
 
-## データ管理をしないアプリケーションの問題点
+ユーザー情報を参照するコンポーネントがもっと多かった場合、ユーザー情報の更新は複雑になり、更新もれなどの問題が発生しやすく、バグの原因になります。
 
-* 同じようなデータがいたるところに存在する
-* 同じようなデータ更新ロジックもいたるところに存在する
-* データまたは更新ロジックがたくさんあるので、どれを使ったらよいか分からない
-* 取得したデータの出どころが分からなく、また意図しないタイミングでデータが更新されてしまうことがある
+</span>
 
 ---
 
 ## データ管理ライブラリを使いましょう
+
+![](assets/img/data-mgmt-issue-2.png)
 
 Vuex のようなデータ管理ライブラリを使用することで、データが中央集権的に管理され、適切なデータの取得、編集を行うことができるようになります。
 
@@ -466,243 +484,6 @@ declare module 'vue/types/vue' {
 Vuex に依存するコードがロジックに吸収されたことにより、画面は Vuex に依存しなくなりました。画面はストアの実装がどのようなライブラリを使用しているかを知りません。
 
 つまりロジックのインターフェイスが変わらない限り、ストアの実装を Vuex 以外のライブラリに置き換えることが可能になりました。
-
----
-
-## 現時点の問題点
-
----
-
-### ストアの実装がタイプセーフでない
-
-<span style="font-size:22px">
-
-Vuex によるストアの実装ではタイプセーフにならない箇所があります。
-
-次はミューテーション実装のコードを抜粋したものです。
-
-```ts
-context.commit(CartTypes.INCREMENT_ITEM_QUANTITY, product.id)
-```
-
-このコードは`incrementItemQuantity`というミューテーションに`product.id`を引数として渡しています。
-
-このコードは IDE によるコード補完が効かないので、引数に何型の値を渡すべきかは、このミューテーションの定義まで移動して調べる必要があります。
-
-また引数の`product.id`にどのような値を渡してもコンパイルエラーになりません。本来この引数には「string 型」の商品 ID を渡すべきなのですが、「number 型」の商品 ID を渡しても動作してしまう可能性があります。この状況は地雷が埋め込まれたようなもので、何かしらのタイミングで不具合として発火する可能性があります。
-
-</span>
-
----
-
-### Vuex による実装が直感的でない
-
-<span style="font-size:16px">
-
-Vuex の実装は数々のお作法に従う必要があり、そのお作法を知らないと実装することはできません。
-例として Vuex のストア実装とそのお作法がどのようなものか見てみましょう。
-
-次のコードはあるアクションの実装を行っています。
-
-<!--
-1. アクション（やミューテーション、ゲッター）は受け取る引数に決まりがあります。アクションの場合は、第 1 引数に`context`を受け取り、第 2 引数に任意の引数を受け取ります。今回は引き数が 1 つなのでよいのですが、2 つ以上になる場合は配列形式で受け取る必要があります。
-
-2. アクションはステートの編集ができません。ステートの編集はミューテーションに依頼する必要があります。ミューテーションの呼び出しは`commit()`を使用します（ちなみにアクションの呼び出しの場合は`dispatch()`を使用します）。
-
-3. 他のモジュールのゲッターへのアクセスは`context.rootGetters`経由で行います。`rootGetters`に対象となるゲッターのフルパス(`"products/getById"`)を指定することで対象のゲッターを使用することができます。ここでは引き数を受け取るゲッターを利用しているので、引き数に商品 ID を渡しています。
-
-4. ここでは他のモジュールのミューテーションを呼び出す必要があるので、フルパス（`"products/decrementInventory"`）を指定しています。またフルパスを指定するにはオプションに`{root: true}`を指定する必要があります。
--->
-
-```ts
-actions: ActionTree<CartState, RootState> = {
-
-  // 1. アクションが受け取る引数のお作法
-  async [CartTypes.ADD_PRODUCT_TO_CART](context, productId: string): Promise<void> {
-    // 2. ミューテーションの呼び出しお作法
-    context.commit(CartTypes.SET_CHECKOUT_STATUS, CheckoutStatus.None)
-    // 3. 他のモジュールのゲッターの呼び出しお作法
-    const product: Product | undefined =
-      context.rootGetters[`${ProductsTypes.PATH}/${ProductsTypes.GET_BY_ID}`](productId)
-    if (!product) {
-      throw new Error(`A Product that matches the specified productId "${productId}" was not found.`)
-    }
-    if (product.inventory > 0) {
-      const cartItem = context.state.items.find(item => item.id === product.id)
-      if (!cartItem) {
-        context.commit(CartTypes.PUSH_PRODUCT_TO_CART, product)
-      } else {
-        context.commit(CartTypes.INCREMENT_ITEM_QUANTITY, product.id)
-      }
-      // 4. 他のモジュールのミューテーションの呼び出しお作法
-      context.commit(
-        `${ProductsTypes.PATH}/${ProductsTypes.DECREMENT_INVENTORY}`,
-        productId, {root: true}
-      )
-    }
-  },
-
-}
-```
-
-Vuex のお作法で理解しづらい部分がノイズとなり、処理の流れを読みにくくしているように感じられます。
-
-</span>
-
----
-
-### モジュール間の依存関係
-
-現在、カートモジュール（`CartModule`）は商品モジュール（`ProductModule`）に依存しています。まだモジュールの数が少ないので問題になりませんが、モジュールの数が増えた状態で依存関係がきちんと整理されていないと、どこかで循環参照が発生する確率が高まります。
-
-このような状況に陥ることは非常に危険です。循環参照はある特定のルートのみで発生するケースが多く、テスト工程をすり抜ける可能性が多々あります。
-
----
-
-# Vuex をやめる
-
-ここまでで示したように Vuex で実装することによりコードが複雑になるというデメリットがあります。
-
-幸いにも現時点で画面は Vuex に依存しなくなっているので、Vuex 以外のストア実装を選択することができます。
-
-ここでは Vuex をやめ、自前でストア実装する方法を説明していきます。
-
----
-
-## モジュールを Vue コンポーネントへ置き換える
-
-Vuex で実装されていたモジュールを Vue コンポーネントへ置き換えます。
-
-次は Vue コンポーネント化したモジュールの一部抜粋です。
-
-<!--
-Vuex と同じようにモジュールはステートを保持します。今回は`m_state`という変数でステートを保持しています。
-
-このステートは外部から直接アクセスできないようにプライベートな変数という位置づけにしています。
-
-外部からステートにアクセスするには個別にゲッターなり、メソッドなりを提供し、これらを経由してステートにアクセスするようにしています。
-
-* `items`というゲッターで、カートに入っているアイテム一覧を提供します。
-* `setCheckoutStatus`というメソッド（Vuex でいうミューテーション）で、現在のチェックアウト状態を設定する機能を提供します。
--->
-
-<span style="font-size:18px">
-
-```ts
-export interface CartState {
-  items: CartItem[]
-  checkoutStatus: CheckoutStatus
-}
-```
-
-```ts
-import Vue from "vue"
-import {Component} from "vue-property-decorator"
-
-@Component
-export class CartModuleImpl extends Vue implements CartModule {
-  m_state: CartState = {
-    items: [],
-    checkoutStatus: CheckoutStatus.None
-  }
-
-  get items(): CartItem[] {
-    return this.m_state.items
-  }
-
-  setCheckoutStatus(status: CheckoutStatus): void {
-    this.m_state.checkoutStatus = status
-  }
-}
-```
-
-</span>
-
----
-
-## モジュール間の依存関係を取り除く
-
-ここまでの実装では、モジュールがいわゆるビジネスロジック（業務処理の塊）の実装を担っていました。ビジネスロジックは複数のモジュールを横断したり、API を呼び出す必要が生じます。
-
-このように複雑な処理はできれば共通的に利用できるようにし、重複したコードを書かないことが理想です。
-
-ただし共通的に利用できるビジネスロジックをモジュールに実装してしまうと、そのビジネスロジックを呼び出したいがためにモジュール間で相互依存の必要性が生じ、これが循環参照の原因になります。
-
-このような理由でモジュールのビジネスロジックに関わる部分はロジックへ移動させる必要があります。
-
----
-
-そこで以下の修正を行いました。
-
-* モジュールで依存している箇所をショップロジック（`ShopLogic`）へ移動します。対象となるのは`CartModule.addProductToCart()`、`CartModule.checkout()`です。
-
-* API の呼び出し箇所をショップロジック（`ShopLogic`）へ移動します。対象となるのは`ProductsModule.pullAll()`です。
-
-この修正によりモジュールの役割がよりシンプルになりました。
-
-モジュールは自身が保持するステートを管理することに専念するのみで、他のモジュールや API に依存しません。これにより循環参照の心配がなくなりました。
-
----
-
-次は依存関係を改善した後の図です。
-
-![150%](assets/img/dependency.png)
-
----
-
-## 改善された点
-
----
-
-### ストアの実装がタイプセーフになった
-
-ストアがタイプセーフになったことで IDE のコード補完の恩恵を受けることができるようになりました。
-
-`import {store} from '@/store'`でストアのインポートを行い、`store.`とタイプしてみてください。`product`、`cart`というように利用可能なモジュール一覧が表示されます。
-
-さらにドット（`.`）をタイプすると、そのモジュールで利用可能なゲッターやメソッドの一覧が表示され、直感的なコーディングが可能になります。
-
-またタイプセーフになったことで、ゲッターやメソッドの名前変更、メソッドのシグネチャ変更も安全に行うことができるようになりました。
-
----
-
-### ストアの使い方が直感的に分かる
-
-次はショップロジックの一部抜粋です。
-
-<span style="font-size:18px">
-  
-```ts
-addProductToCart(productId: string): void {
-  store.cart.setCheckoutStatus(CheckoutStatus.None)
-  const product = store.products.getById(productId)
-  if (!product) {
-    throw new Error(
-      `A Product that matches the specified productId "${productId}" was not found.`
-    )
-  }
-  if (product.inventory > 0) {
-    const cartItem = store.cart.items.find(item => item.id === product.id)
-    if (!cartItem) {
-      store.cart.addProductToCart(product)
-    } else {
-      store.cart.incrementItemQuantity(productId)
-    }
-    store.products.decrementInventory(productId)
-  }
-}
-```
-</span>
-
-Vuex のお作法がなくなった分、ビジネスロジックの流れに集中できるようになり、どのような処理を行っているかが分かりやすくなったと思います。
-
----
-
-### 依存関係を改善することができた
-
-依存関係を見直したことにより、循環参照の心配がなくなりました。
-
-これにより、仕様変更や機能追加の際に「このモジュールを参照すると循環参照になるんじゃないか…」といった心配をする必要がなくなり、安全かつ柔軟にコーディングできるようになりました。
 
 ---
 
