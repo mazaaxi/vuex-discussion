@@ -54,13 +54,13 @@ import {CartTypes, CheckoutStatus, Product, ProductsTypes} from '@/store'
   },
 })
 export default class ShoppingPage extends Vue {
-  checkoutStatus!: CartTypes.checkoutStatus
+  checkoutStatus: CartTypes.checkoutStatus
 
-  addProductToCart!: CartTypes.addProductToCart
+  addProductToCart: CartTypes.addProductToCart
 
-  pullAllProducts!: ProductsTypes.pullAll
+  pullAllProducts: ProductsTypes.pullAll
 
-  checkout!: CartTypes.checkout
+  checkout: CartTypes.checkout
 
   async created() {
     await this.pullAllProducts()
