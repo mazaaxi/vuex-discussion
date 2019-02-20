@@ -23,11 +23,11 @@ Vuex で登場する重要な単語について説明します。
 -->
 * 画面からストアを利用する
 <!--
-画面からVuex のストアを利用するためのコーディングを見ながら説明します。
+画面から Vuex のストアを利用するためのコーディングを見ていきます。
 -->
 * 画面からストアを利用する方法を改善する
 <!--
-画面からVuex のストアを利用するためのコーディングを改善します。
+画面から Vuex のストアを利用するためのコーディングを改善します。
 -->
 
 ---
@@ -61,6 +61,10 @@ Vuex はこのようなアプリケーションのデータ管理をするため
 ![](assets/img/data-mgmt-issue-2.png)
 
 Vuex のようなデータ管理ライブラリを使用することで、データが中央集権的に管理され、適切なデータの取得、編集を行うことができるようになります。
+
+<!--
+分散していたユーザー情報が ストア（Vuex）に集約されました。またユーザー情報の取得、編集は必ずストアを経由することになります。
+-->
 
 ---
 
@@ -98,7 +102,7 @@ Vuex には重要な単語がいくつかありますが、最初はこの単語
 
 ## ミューテーション
 
-ミューテーションはステートを編集をするための機能を提供します。
+ミューテーションはステートを編集するための機能を提供します。
 
 ---
 
@@ -237,7 +241,7 @@ export namespace CartTypes {
 <!--
 今回はゲッターの場合と異なり、定義したアクションをクラス（ShoppingPage）の中で使用しています。この場合methodsでアクションを定義するだけではクラスの中で使用することができません。これはthis.addProductToCartと記述してもコンパイラがaddProductToCartというメソッドをクラスの中に見つけられないためです。
 
-そこで TypeScript でアクション（またはゲッター、ミューテーション）を使用するにはクラスにアクションをインスタンス変数として定義する必要があります。それが`addProductToCart!: CartTypes.addProductToCart`の部分になります。
+そこで TypeScript でアクション（またはゲッター、ミューテーション）を使用するにはクラスにアクションをインスタンス変数として定義する必要があります。それが`addProductToCart: CartTypes.addProductToCart`の部分になります。
 
 これでアクションが`this.addProductToCart(product.id)`のようにクラスの中で使用できるようになりました。
 -->
@@ -254,7 +258,7 @@ import {CartTypes} from '@/store'
   },
 })
 export default class ShoppingPage extends Vue {
-  addProductToCart!: CartTypes.addProductToCart
+  addProductToCart: CartTypes.addProductToCart
 
   async m_addButtonOnClick(product: Product): Promise<void> {
     await this.addProductToCart(product.id)
@@ -287,9 +291,9 @@ export default class ShoppingPage extends Vue {
 ```ts
 export default class ShoppingPage extends Vue {
 
-  addProductToCart!: CartTypes.addProductToCart
+  addProductToCart: CartTypes.addProductToCart
   // ↓ これと同意
-  addProductToCart!: (productId: string) => Promise<void>
+  addProductToCart: (productId: string) => Promise<void>
 
 }
 ```
@@ -495,6 +499,6 @@ Vuex に依存するコードがロジックに吸収されたことにより、
 
 デファクトスタンダードな Vuex を採用する安心感もありますし、今後は Vuex が TypeScript でより実装しやすく改善されていくでしょう。
 
-ただ Vuex 以外の選択肢もあるのではないでしょうか。
+ただ今日提示したような改善案もあるのではないでしょうか。
 
 今回の考察に異論はあると思いますが、それでもこの考察が何かしらの役に立つことができたなら幸いです。
