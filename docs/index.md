@@ -161,7 +161,7 @@ import {CartTypes} from '@/store'
   },
 })
 export default class ShoppingPage extends Vue {
-  addProductToCart!: CartTypes.addProductToCart
+  addProductToCart: CartTypes.addProductToCart
 
   async m_addButtonOnClick(product: Product): Promise<void> {
     await this.addProductToCart(product.id)
@@ -173,7 +173,7 @@ export default class ShoppingPage extends Vue {
 
 > NOTE: アクションに限らずゲッター、ミューテーションも同様です。
 
-そこで TypeScript でアクション（またはゲッター、ミューテーション）を使用するにはクラスにアクションをインスタンス変数として定義する必要があります。それが`addProductToCart!: CartTypes.addProductToCart`の部分になります。
+そこで TypeScript でアクション（またはゲッター、ミューテーション）を使用するにはクラスにアクションをインスタンス変数として定義する必要があります。それが`addProductToCart: CartTypes.addProductToCart`の部分になります。
 
 これでアクションが`this.addProductToCart(product.id)`のようにクラスの中で使用できるようになりました。
 
@@ -193,9 +193,9 @@ export default class ShoppingPage extends Vue {
 ```ts
 export default class ShoppingPage extends Vue {
 
-  addProductToCart!: CartTypes.addProductToCart
+  addProductToCart: CartTypes.addProductToCart
   // ↓ これと同意
-  addProductToCart!: (productId: string) => Promise<void>
+  addProductToCart: (productId: string) => Promise<void>
 
 }
 ```
