@@ -100,7 +100,7 @@ export namespace CartTypes {
 
 ここでは`cart`モジュールの`items`というゲッターを`cartItems`という名前で使用するよう定義しています。
 
-```ts
+```ts:src/store/types.ts
 import {mapGetters} from 'vuex'
 import {CartTypes} from '@/store'
 
@@ -118,7 +118,7 @@ export default class ShoppingPage extends Vue {
 
 `mapGetters`で定義を行うと、テンプレートの中で定義したゲッターを使用することができます。
 
-```html
+```html:src/pages/shopping/index.vue
 <p v-show="!cartItems.length">
   <i>Please add some products to cart.</i>
 </p>
@@ -130,7 +130,7 @@ export default class ShoppingPage extends Vue {
 
 次はアクションで使用するストア定義の抜粋になります。
 
-```ts
+```ts:src/store/types.ts
 export namespace CartTypes {
   export const PATH = 'cart'
 
@@ -146,7 +146,7 @@ export namespace CartTypes {
 
 ここでは`cart`モジュールの`addProductToCart`というアクションをそのままの名前(`addProductToCart`)で使用するよう定義しています。
 
-```ts
+```ts:src/pages/shopping/index.vue
 import {mapActions} from 'vuex'
 import {CartTypes} from '@/store'
 
@@ -184,7 +184,7 @@ export default class ShoppingPage extends Vue {
 
 #### 適切な引数を渡すことができる
 
-```ts
+```ts:src/pages/shopping/index.vue
 export default class ShoppingPage extends Vue {
 
   addProductToCart!: CartTypes.addProductToCart
@@ -250,13 +250,13 @@ this.addProductToCart(999)
 
 この結果、画面からストアへのアクセスは次のように改善されました。
 
-```html
+```html:src/pages/shopping/index.vue
 <p v-show="!$logic.shop.cartItems.length">
   <i>Please add some products to cart.</i>
 </p>
 ```
 
-```ts
+```ts:src/pages/shopping/index.vue
 async m_addButtonOnClick(product: Product): Promise<void> {
   await this.$logic.shop.addProductToCart(product.id)
 }
@@ -272,8 +272,8 @@ async m_addButtonOnClick(product: Product): Promise<void> {
 
 次はショップロジックの一部抜粋です。
 
-```ts
-import {store} from "@/store"
+```ts:src/logic/shop/index.ts
+import {store} from '@/store'
 
 @Component
 export class ShopLogicImpl extends Vue implements ShopLogic {
@@ -294,13 +294,13 @@ export class ShopLogicImpl extends Vue implements ShopLogic {
 
 次のコードはロジックをどの画面からでも簡単にアクセスできるようにしています。
 
-```ts
+```ts:src/logic/types.ts
 interface Logic {
   shop: ShopLogic
 }
 ```
 
-```ts
+```ts:src/logic/index.ts
 class LogicImpl implements Logic {
   constructor() {
     this.m_shop = new ShopLogicImpl()
@@ -314,15 +314,13 @@ class LogicImpl implements Logic {
 }
 
 export const logic: Logic = new LogicImpl()
-Object.defineProperty(Vue.prototype, "$logic", {
+Object.defineProperty(Vue.prototype, '$logic', {
   value: logic,
   writable: false
 })
 ```
 
-`src/types/vue.d.ts`
-
-```ts
+```ts:src/types/vue.d.ts
 import 'vue'
 import {Logic} from '@/logic'
 
@@ -357,19 +355,13 @@ Vuex に依存するコードがロジックに吸収されたことにより、
 
 ### 現時点の問題点
 
-#### モジュール間の依存関係
-
-現在、カートモジュール（`CartModule`）は商品モジュール（`ProductModule`）に依存しています。まだモジュールの数が少ないので問題になりませんが、モジュールの数が増えた状態で依存関係がきちんと整理されていないと、どこかで循環参照が発生する確率が高まります。
-
-このような状況に陥ることは非常に危険です。循環参照はある特定のルートのみで発生するケースが多く、テスト工程をすり抜ける可能性が多々あります。
-
 #### ストアの実装がタイプセーフでない
 
 Vuex によるストアの実装ではタイプセーフにならない箇所があります。
 
 次はミューテーション実装のコードを抜粋したものです。
 
-```ts
+```ts:src/store/modules/cart/index.ts
 context.commit(CartTypes.INCREMENT_ITEM_QUANTITY, product.id)
 ```
 
@@ -381,13 +373,12 @@ context.commit(CartTypes.INCREMENT_ITEM_QUANTITY, product.id)
 
 #### Vuex による実装が直感的でない
 
-Vuex の実装は数々のお作法に従う必要があり、その作法を知らないと実装することはできません。
-
-例として Vuex のストア実装とその作法がどのようなものか見てみましょう。
+Vuex の実装は数々のお作法に従う必要があり、そのお作法を知らないと実装することはできません。
+例として Vuex のストア実装とそのお作法にどのようなものか見てみましょう。
 
 次のコードはあるアクションの実装を行っています。
 
-```ts
+```ts:src/store/modules/cart/index.ts
 actions: ActionTree<CartState, RootState> = {
 
   // 1. アクションが受け取る引数の作法
@@ -417,7 +408,7 @@ actions: ActionTree<CartState, RootState> = {
 }
 ```
 
-1. アクション（やミューテーション、ゲッター）は受け取る引数に決まりがあります。アクションの場合は、第 1 引数に`context`を受け取り、第 2 引数に任意の引数を受け取ります。今回は引き数が 1 つなのでよいのですが、2 つ以上になる場合はオブジェクト形式で受け取る必要があります。
+1. アクション（やミューテーション、ゲッター）は受け取る引数に決まりがあります。アクションの場合は、第 1 引数に`context`を受け取り、第 2 引数に任意の引数を受け取ります。今回は引き数が 1 つなのでよいのですが、2 つ以上になる場合は配列形式で受け取る必要があります。
 
 2. アクションはステートの編集ができません。ステートの編集はミューテーションに依頼する必要があります。ミューテーションの呼び出しは`commit()`を使用します（ちなみにアクションの呼び出しの場合は`dispatch()`を使用します）。
 
@@ -425,13 +416,19 @@ actions: ActionTree<CartState, RootState> = {
 
 4. ここでは他のモジュールのミューテーションを呼び出す必要があるので、フルパス（`"products/decrementInventory"`）を指定しています。またフルパスを指定するにはオプションに`{root: true}`を指定する必要があります。
 
-Vuex の作法で理解しづらい部分がノイズとなり、処理の流れを読みにくくしているように感じられます。
+Vuex の作法で理解しづらい部分がノイズとなり、処理の流れが読みにくくなっています。
+
+#### モジュール間の依存関係
+
+現在、カートモジュール（`CartModule`）は商品モジュール（`ProductModule`）に依存しています。まだモジュールの数が少ないので問題になりませんが、モジュールの数が増えた状態で依存関係がきちんと整理されていないと、どこかで循環参照が発生する確率が高まります。
+
+このような状況に陥ることは非常に危険です。循環参照はある特定のルートのみで発生するケースが多く、テスト工程をすり抜ける可能性が多々あります。
 
 ## Vuex をやめる
 
 > この項で出てくるソースコードは`v3-no-vuex`ブランチのものになります。
 
-上記で示したように Vuex で実装することによりコードが複雑になるというデメリットがあります。
+ここまでで示したように Vuex で実装することによりコードが複雑になるというデメリットがあります。
 
 幸いにも現時点で画面は Vuex に依存しなくなっているので、Vuex 以外のストア実装を選択することができます。
 
@@ -443,16 +440,16 @@ Vuex で実装されていたモジュールを Vue コンポーネントへ置�
 
 次は Vue コンポーネント化したモジュールの一部抜粋です。
 
-```ts
+```ts:src/store/types.ts
 export interface CartState {
   items: CartItem[]
   checkoutStatus: CheckoutStatus
 }
 ```
 
-```ts
-import Vue from "vue"
-import { Component } from "vue-property-decorator"
+```ts:src/store/modules/cart/index.ts
+import Vue from 'vue'
+import { Component } from 'vue-property-decorator'
 
 @Component
 export class CartModuleImpl extends Vue implements CartModule {
@@ -471,7 +468,7 @@ export class CartModuleImpl extends Vue implements CartModule {
 }
 ```
 
-モジュールがステートを保持する Vuex の仕様を引き継ぎ、今回は`m_state`という変数でステートを保持しています。
+Vuex と同じようにモジュールはステートを保持します。今回は`m_state`という変数でステートを保持しています。
 
 このステートは外部から直接アクセスできないようにプライベートな変数という位置づけにしています。
 
@@ -520,7 +517,7 @@ export class CartModuleImpl extends Vue implements CartModule {
 
 次はショップロジックの一部抜粋です。
 
-```ts
+```ts:src/logic/shop/index.ts
 addProductToCart(productId: string): void {
   store.cart.setCheckoutStatus(CheckoutStatus.None)
   const product = store.products.getById(productId)
